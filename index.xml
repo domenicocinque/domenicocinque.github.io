@@ -15,7 +15,7 @@
       <pubDate>Sun, 19 Nov 2023 16:33:14 +0100</pubDate>
       <guid>https://domenicocinque.github.io/old-models-new-frameworks-reviving-gans-with-flax/</guid>
       <description>The purpose of this blog post is to guide you through the implementation of a Generative Adversarial Network (GAN) with Flax.
-My journey into this topic began with JAX, a new framework by Google that combines a Numpy-like interface with advanced features like Autograd and XLA compilation for incredibly fast numerical computation. What&amp;rsquo;s more, it&amp;rsquo;s built on the principles of functional programming, meaning functions are purely dependent on input parameters, free from external state influences.</description>
+My journey into this topic began with JAX, a new framework by Google that combines a Numpy-like interface with advanced features like Autograd and XLA compilation. Moreover, it is built on the principles of functional programming, meaning functions are purely dependent on input parameters, free from external state influences. For those intrigued by the inner workings of JAX, I highly recommend exploring its documentation, which offers insights on pure functions and random number generation.</description>
     </item>
   </channel>
 </rss>
