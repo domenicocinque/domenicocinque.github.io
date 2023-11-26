@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en-US">
+
+<head>
+  <meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="shortcut icon" href="https://domenicocinque.github.io/images/favicon.png" />
+<title>Old Models, New Frameworks: Reviving GANs with Flax | Domenico Cinque</title>
+<meta name="title" content="Old Models, New Frameworks: Reviving GANs with Flax" />
+<meta name="description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks." />
+<meta name="keywords" content="" />
+
+
+<meta property="og:title" content="Old Models, New Frameworks: Reviving GANs with Flax" />
+<meta property="og:description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://domenicocinque.github.io/old-models-new-frameworks-reviving-gans-with-flax/" /><meta property="og:image" content="https://domenicocinque.github.io/images/share.png"/><meta property="article:section" content="blog" />
+<meta property="article:published_time" content="2023-11-19T16:33:14+01:00" />
+<meta property="article:modified_time" content="2023-11-19T16:33:14+01:00" /><meta property="og:site_name" content="Hugo ʕ•ᴥ•ʔ Bear" />
+
+
+
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://domenicocinque.github.io/images/share.png"/>
+
+<meta name="twitter:title" content="Old Models, New Frameworks: Reviving GANs with Flax"/>
+<meta name="twitter:description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks."/>
+
+
+
+<meta itemprop="name" content="Old Models, New Frameworks: Reviving GANs with Flax">
+<meta itemprop="description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks."><meta itemprop="datePublished" content="2023-11-19T16:33:14+01:00" />
+<meta itemprop="dateModified" content="2023-11-19T16:33:14+01:00" />
+<meta itemprop="wordCount" content="1478"><meta itemprop="image" content="https://domenicocinque.github.io/images/share.png"/>
+<meta itemprop="keywords" content="" />
+<meta name="referrer" content="no-referrer-when-downgrade" />
+
+  <style>
+  body {
+    font-family: Verdana, sans-serif;
+    margin: auto;
+    padding: 20px;
+    max-width: 720px;
+    text-align: left;
+    background-color: #fff;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    line-height: 1.5;
+    color: #444;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  strong,
+  b {
+    color: #222;
+  }
+
+  a {
+    color: #3273dc;
+     
+  }
+
+  .title {
+    text-decoration: none;
+    border: 0;
+  }
+
+  .title span {
+    font-weight: 400;
+  }
+
+  nav a {
+    margin-right: 10px;
+  }
+
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  input {
+    font-size: 16px;
+  }
+
+  content {
+    line-height: 1.6;
+  }
+
+  table {
+    width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+  }
+
+  code {
+    padding: 2px 5px;
+    background-color: #f2f2f2;
+  }
+
+  pre code {
+    color: #222;
+    display: block;
+    padding: 20px;
+    white-space: pre-wrap;
+    font-size: 14px;
+    overflow-x: auto;
+  }
+
+  div.highlight pre {
+    background-color: initial;
+    color: initial;
+  }
+
+  div.highlight code {
+    background-color: unset;
+    color: unset;
+  }
+
+  blockquote {
+    border-left: 1px solid #999;
+    color: #222;
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  footer {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .helptext {
+    color: #777;
+    font-size: small;
+  }
+
+  .errorlist {
+    color: #eba613;
+    font-size: small;
+  }
+
+   
+  ul.blog-posts {
+    list-style-type: none;
+    padding: unset;
+  }
+
+  ul.blog-posts li {
+    display: flex;
+  }
+
+  ul.blog-posts li span {
+    flex: 0 0 130px;
+  }
+
+  ul.blog-posts li a:visited {
+    color: #8b6fcb;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background-color: #333;
+      color: #ddd;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong,
+    b {
+      color: #eee;
+    }
+
+    a {
+      color: #8cc2dd;
+    }
+
+    code {
+      background-color: #777;
+    }
+
+    pre code {
+      color: #ddd;
+    }
+
+    blockquote {
+      color: #ccc;
+    }
+
+    textarea,
+    input {
+      background-color: #252525;
+      color: #ddd;
+    }
+
+    .helptext {
+      color: #aaa;
+    }
+  }
+
+</style>
+
+</head>
+
+<body>
+  <header><a href="/" class="title">
+  <h2>Domenico Cinque</h2>
+</a>
+<nav><a href="/">Home</a>
+
+
+<a href="/blog">Blog</a>
+
+</nav>
+</header>
+  <main>
+
+<h1>Old Models, New Frameworks: Reviving GANs with Flax</h1>
+<p>
+  <i>
+    <time datetime='2023-11-19' pubdate>
+      19 Nov, 2023
+    </time>
+  </i>
+</p>
+
+<content>
+  <p>The purpose of this blog post is to guide you through the implementation of a Generative Adversarial Network (GAN) with Flax.</p>
+<p>My journey into this topic began with JAX, a new framework by Google that combines a Numpy-like interface with advanced features like Autograd and XLA compilation for incredibly fast numerical computation. What&rsquo;s more, it&rsquo;s built on the principles of functional programming, meaning functions are purely dependent on input parameters, free from external state influences. For those intrigued by the inner workings of JAX, I highly recommend exploring its <a href="https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html">documentation</a>, which is very nice to read.</p>
+<p>While you can build neural networks directly with JAX, the ecosystem around it, particularly Flax for architecture construction and Optax for optimization and loss functions, make the development process more enjoyable.</p>
+<p>Our focus here will be on implementing a simple GAN. If you&rsquo;re new to GANs, don&rsquo;t worry. I&rsquo;ll guide you through both the theory and the practical aspects, drawing insights from Chapter 26 of the great book, <a href="https://probml.github.io/pml-book/book2.html">Probabilistic Machine Learning: Advanced Topics</a>.</p>
+<h2 id="a-bit-of-theory-on-gans">A Bit of Theory on GANs</h2>
+<p>Generative Adversarial Networks (GANs), introduced in the <a href="https://arxiv.org/abs/1406.2661">seminal paper</a> by Ian Goodfellow et al. in 2017, have revolutionized the field of machine learning and laid the foundations for the modern generative models.</p>
+<h3 id="the-need-for-two-networks">The Need for Two Networks</h3>
+<p>Imagine you want to generate new data from an unknown distribution $p^*$, from which we have some examples.</p>
+<p>GANs approach this problem by using two networks a <strong>generator</strong> and a <strong>discriminator</strong>.
+The use of two networks in machine learning is quite unusual, since we tend to train networks using static loss functions that are able to tell wether the output is good or not. This is simple in the case of a classification problem, but in this case, in order to tell if a sample is good, we would need to have access to the true distribution $p^*$ and compute some distance $\mathcal D(p^*,q)$ from the true distribution to our generated data, which we will denote by $q$.</p>
+<p>Instead of using a predefined loss function, GANs employ a <strong>discriminator</strong> as a dynamic loss function for the <strong>generator</strong>. The generator&rsquo;s goal is to produce data so convincing that the discriminator, trained to distinguish real data from fake, gets fooled.</p>
+<ul>
+<li>The Generator $G_\theta$ model takes as input random noise $q(\mathbf z)$, such as a gaussian $q(\mathbf z)\sim\mathcal N (0,1)$, passes the noise trough some layers and produces a density $q_\theta(\mathbf x)$ on the output space.</li>
+<li>The Discriminator $D_\phi$ is a classifier that is able to tell wether a sample is from $p^*$ or not.</li>
+</ul>
+<h3 id="training-the-networks">Training the Networks</h3>
+<p>The training process consists of two phases:</p>
+<ol>
+<li><strong>First Phase:</strong> The discriminator $D_\phi$ is trained for $K$ steps in which we sample noise from $q(\mathbf z)$ and some true examples from the dataset. The discriminator is optimized to distinguish real data apart from fake data, therefore we optimize the usual cross-entropy loss:</li>
+</ol>
+<p>$$
+\min_\phi -\overbrace{y\log [D_\phi(\mathbf x)]}^{\textrm{real data}} -\overbrace{(1-y)\log[1-D_\phi(G_\theta(\mathbf z))]}^{\textrm{fake data}}
+$$</p>
+<ol>
+<li><strong>Second Phase:</strong> After the first phase we should have a good discriminator that we can use to improve the generator. Therefore we sample noise from $q(\mathbf z)$ and we maximize the chance to fool the discriminator:
+$$\max_\theta-\log[1-D_\phi(G_\theta(\mathbf z))]$$
+In the second phase, when the generator performs poorly, hence $D_\phi(G_\theta(\mathbf z))\approx 0$, we have that the loss is near zero, therefore the gradients may be too small for the generator to make good progress. This problem can be solved by using an equivalent formulation with better gradients, called, &ldquo;non-saturating loss&rdquo;:
+$$\min_\theta -\log[D_\phi(G_\theta(\mathbf z))]$$
+Now we have all the ingredients needed to code!</li>
+</ol>
+<h2 id="implementation">Implementation</h2>
+<h3 id="generator-and-discriminator">Generator and Discriminator</h3>
+<p>We&rsquo;ll use Flax&rsquo;s <code>linen</code> module for defining our models, which offers a PyTorch-like class instantiation. The key difference is that we&rsquo;re defining a dataclass, which doesn&rsquo;t hold the network&rsquo;s parameters itself, but only serves to apply a series of transformations.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> jax
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> flax.linen <span style="color:#66d9ef">as</span> nn
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Generator</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    hidden_channels: int
+</span></span><span style="display:flex;"><span>    batch_size: int
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@nn.compact</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __call__(self, z_rng):
+</span></span><span style="display:flex;"><span>	    <span style="color:#75715e"># Latent (for which we need a random number generator)</span>
+</span></span><span style="display:flex;"><span>        z <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(z_rng, (self<span style="color:#f92672">.</span>batch_size, <span style="color:#ae81ff">2</span>))
+</span></span><span style="display:flex;"><span>        z <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dense(self<span style="color:#f92672">.</span>hidden_channels)(z)
+</span></span><span style="display:flex;"><span>        z <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>leaky_relu(z)
+</span></span><span style="display:flex;"><span>        z <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dense(self<span style="color:#f92672">.</span>hidden_channels)(z)
+</span></span><span style="display:flex;"><span>        z <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>leaky_relu(z)
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># Data in the sample space</span>
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">2</span>)(z)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> x
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Discriminator</span>(nn<span style="color:#f92672">.</span>Module):
+</span></span><span style="display:flex;"><span>    hidden_channels: int
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">@nn.compact</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> __call__(self, x):
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dense(self<span style="color:#f92672">.</span>hidden_channels)(x)
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>leaky_relu(x)
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dense(self<span style="color:#f92672">.</span>hidden_channels)(x)
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>leaky_relu(x)
+</span></span><span style="display:flex;"><span>        x <span style="color:#f92672">=</span> nn<span style="color:#f92672">.</span>Dense(<span style="color:#ae81ff">2</span>)(x)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> x
+</span></span></code></pre></div><p>The  <code>nn.compact</code> decorator allows to define the network directly in the <code>__call__</code>method. This approach simplifies the model creation process, though we could define layers separately as well (check out <a href="https://flax.readthedocs.io/en/latest/guides/flax_fundamentals/setup_or_nncompact.html">setup vs compact</a> for more info on that). You might have noticed that the generator <code>__call__</code>method requires a random number generator as input. This is because random number generation in JAX is handled directly by the user. This may sound like a lot of effort, but it allows to take control over the randomness generation by forcing you to think carefully about what is going on.</p>
+<p>I also defined two functions that will come in handy to use <code>functools.partial</code> later in the code:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generator_model</span>(hidden_channels, batch_size):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Generator(hidden_channels<span style="color:#f92672">=</span>hidden_channels, batch_size<span style="color:#f92672">=</span>batch_size)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">discriminator_model</span>(hidden_channels):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Discriminator(hidden_channels<span style="color:#f92672">=</span>hidden_channels)
+</span></span></code></pre></div><h3 id="data-generation">Data Generation</h3>
+<p>In our example we will consider a simple distribution as our dataset, where using GANs might seem like overkill but serves as a good example.</p>
+<p><img src="/circle_data.png?width=50%25" alt="Dataset"></p>
+<p>In the following code we can see data generation and dataloader. Notice that in order to generate the data we need 3 sources of randomness, therefore we need 3 keys generated from the main seed.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Tuple
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jax
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jax.numpy <span style="color:#66d9ef">as</span> jnp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> jax <span style="color:#f92672">import</span> random
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_circle_data</span>(
+</span></span><span style="display:flex;"><span>    key: random<span style="color:#f92672">.</span>PRNGKey, n_samples: int, r: int <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, noise: float <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.05</span>
+</span></span><span style="display:flex;"><span>):
+</span></span><span style="display:flex;"><span>    subkey1, subkey2, subkey3 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>split(key, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>    theta <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>uniform(
+</span></span><span style="display:flex;"><span>        key<span style="color:#f92672">=</span>subkey1, shape<span style="color:#f92672">=</span>(n_samples,), minval<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, maxval<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>pi
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    x_noise <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(key<span style="color:#f92672">=</span>subkey2, shape<span style="color:#f92672">=</span>(n_samples,)) <span style="color:#f92672">*</span> noise
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> r <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>cos(theta) <span style="color:#f92672">+</span> x_noise
+</span></span><span style="display:flex;"><span>    y_noise <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(key<span style="color:#f92672">=</span>subkey3, shape<span style="color:#f92672">=</span>(n_samples,)) <span style="color:#f92672">*</span> noise
+</span></span><span style="display:flex;"><span>    y <span style="color:#f92672">=</span> r <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>sin(theta) <span style="color:#f92672">+</span> y_noise
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jnp<span style="color:#f92672">.</span>stack([x, y], axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_dataloader</span>(dataset: Tuple[np<span style="color:#f92672">.</span>ndarray, <span style="color:#f92672">...</span>], batch_size: int):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>Dataset<span style="color:#f92672">.</span>from_tensor_slices(dataset)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>shuffle(<span style="color:#ae81ff">2000</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>batch(batch_size, drop_remainder<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>as_numpy_iterator()
+</span></span><span style="display:flex;"><span>    )
+</span></span></code></pre></div><h3 id="training-loop">Training Loop</h3>
+<p>The training loop consists of initializing the models and defining the training steps for both the generator and discriminator. First we use <code>functools.partial</code> to derive functions with certain arguments pre-filled, then we need to initialize the parameters of the networks by using the <code>init</code> method of the <code>linen</code> module.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># We use partial to pass the hidden_channels and batch_size to the model</span>
+</span></span><span style="display:flex;"><span>generator <span style="color:#f92672">=</span> partial(
+</span></span><span style="display:flex;"><span>	generator_model,
+</span></span><span style="display:flex;"><span>	hidden_channels<span style="color:#f92672">=</span>cfg<span style="color:#f92672">.</span>hidden_dims,
+</span></span><span style="display:flex;"><span>	batch_size<span style="color:#f92672">=</span>cfg<span style="color:#f92672">.</span>batch_size
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>discriminator <span style="color:#f92672">=</span> partial(
+</span></span><span style="display:flex;"><span>	discriminator_model,
+</span></span><span style="display:flex;"><span>	hidden_channels<span style="color:#f92672">=</span>cfg<span style="color:#f92672">.</span>hidden_dims
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#75715e"># Init parameters by passing a dummy input</span>
+</span></span><span style="display:flex;"><span>generator_params <span style="color:#f92672">=</span> generator()<span style="color:#f92672">.</span>init(rngs<span style="color:#f92672">=</span>gen_key, z_rng<span style="color:#f92672">=</span>gen_key)
+</span></span><span style="display:flex;"><span>discriminator_params <span style="color:#f92672">=</span> discriminator()<span style="color:#f92672">.</span>init(
+</span></span><span style="display:flex;"><span>	disc_key, jnp<span style="color:#f92672">.</span>ones((cfg<span style="color:#f92672">.</span>batch_size, <span style="color:#ae81ff">2</span>), dtype<span style="color:#f92672">=</span>jnp<span style="color:#f92672">.</span>float32)
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>Then, we instantiate two <code>TrainState</code> dataclasses, which are useful to have model functions, parameters and optimizers in one place without having to pass all of them as argument to the training functions:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># Instantiate training states</span>
+</span></span><span style="display:flex;"><span>gen_state <span style="color:#f92672">=</span> train_state<span style="color:#f92672">.</span>TrainState<span style="color:#f92672">.</span>create(
+</span></span><span style="display:flex;"><span>	apply_fn<span style="color:#f92672">=</span>generator()<span style="color:#f92672">.</span>apply,
+</span></span><span style="display:flex;"><span>	params<span style="color:#f92672">=</span>generator_params,
+</span></span><span style="display:flex;"><span>	tx<span style="color:#f92672">=</span>optax<span style="color:#f92672">.</span>adam(learning_rate<span style="color:#f92672">=</span>cfg<span style="color:#f92672">.</span>gen_lr),
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>disc_state <span style="color:#f92672">=</span> train_state<span style="color:#f92672">.</span>TrainState<span style="color:#f92672">.</span>create(
+</span></span><span style="display:flex;"><span>	apply_fn<span style="color:#f92672">=</span>discriminator()<span style="color:#f92672">.</span>apply,
+</span></span><span style="display:flex;"><span>	params<span style="color:#f92672">=</span>discriminator_params,
+</span></span><span style="display:flex;"><span>	tx<span style="color:#f92672">=</span>optax<span style="color:#f92672">.</span>adam(learning_rate<span style="color:#f92672">=</span>cfg<span style="color:#f92672">.</span>disc_lr),
+</span></span><span style="display:flex;"><span>)
+</span></span></code></pre></div><p>The training process follows the phases discussed earlier:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">train_step</span>(gen_state, disc_state, batch, rng, cfg):
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Generate random numbers</span>
+</span></span><span style="display:flex;"><span>    rng, gen_key, disc_key <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>split(rng, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># First phase: Discriminator steps</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(cfg<span style="color:#f92672">.</span>disc_steps):
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># We need to re-initialize the key for the latent space,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># otherwise the generator will always generate the same data</span>
+</span></span><span style="display:flex;"><span>        rng, gen_key <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>split(rng)
+</span></span><span style="display:flex;"><span>        disc_state, disc_loss <span style="color:#f92672">=</span> discriminator_step(
+</span></span><span style="display:flex;"><span>            gen_state, disc_state, batch, disc_key
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e"># Second phase: Generator step</span>
+</span></span><span style="display:flex;"><span>	gen_state, gen_loss <span style="color:#f92672">=</span> generator_step(gen_state, disc_state, gen_key)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> gen_state, disc_state, gen_loss, disc_loss, rng
+</span></span></code></pre></div><p>Let&rsquo;s take a closer look at the discriminator step:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#a6e22e">@jit</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">discriminator_step</span>(gen_state, disc_state, batch, latent_key):
+</span></span><span style="display:flex;"><span>    fake_data <span style="color:#f92672">=</span> gen_state<span style="color:#f92672">.</span>apply_fn(gen_state<span style="color:#f92672">.</span>params, latent_key)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">loss_fn</span>(params):
+</span></span><span style="display:flex;"><span>        fake_logits <span style="color:#f92672">=</span> disc_state<span style="color:#f92672">.</span>apply_fn(params, fake_data)
+</span></span><span style="display:flex;"><span>        real_logits <span style="color:#f92672">=</span> disc_state<span style="color:#f92672">.</span>apply_fn(params, batch)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        fake_loss <span style="color:#f92672">=</span> optax<span style="color:#f92672">.</span>sigmoid_binary_cross_entropy(
+</span></span><span style="display:flex;"><span>            fake_logits, jnp<span style="color:#f92672">.</span>zeros_like(fake_logits)
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        real_loss <span style="color:#f92672">=</span> optax<span style="color:#f92672">.</span>sigmoid_binary_cross_entropy(
+</span></span><span style="display:flex;"><span>            real_logits, jnp<span style="color:#f92672">.</span>ones_like(real_logits)
+</span></span><span style="display:flex;"><span>        )
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> jnp<span style="color:#f92672">.</span>mean(fake_loss <span style="color:#f92672">+</span> real_loss)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> loss
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    loss, grads <span style="color:#f92672">=</span> value_and_grad(loss_fn)(disc_state<span style="color:#f92672">.</span>params)
+</span></span><span style="display:flex;"><span>    disc_state <span style="color:#f92672">=</span> disc_state<span style="color:#f92672">.</span>apply_gradients(grads<span style="color:#f92672">=</span>grads)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> disc_state, loss
+</span></span></code></pre></div><p>The <code>@jit</code> decorator here compiles the function for faster execution. The loss function is defined inside the step and takes as input only the parameters of the discriminator. This is useful to apply <code>value_and_grad</code>, that computes the gradient of the loss with respect to its parameters, and returns its value.  Finally we update the parameters in the state by using <code>apply_gradients</code>.</p>
+<p>The generator step is similar, with a different loss function:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#a6e22e">@jit</span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generator_step</span>(gen_state, disc_state, latent_key):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">loss_fn</span>(params):
+</span></span><span style="display:flex;"><span>        fake_data <span style="color:#f92672">=</span> gen_state<span style="color:#f92672">.</span>apply_fn(params, latent_key)
+</span></span><span style="display:flex;"><span>        fake_logits <span style="color:#f92672">=</span> disc_state<span style="color:#f92672">.</span>apply_fn(disc_state<span style="color:#f92672">.</span>params, fake_data)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># In the non-saturating loss, we want to maximize the probability that</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># the discriminator classifies the fake data as real</span>
+</span></span><span style="display:flex;"><span>        loss <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>jnp<span style="color:#f92672">.</span>mean(jnp<span style="color:#f92672">.</span>log(nn<span style="color:#f92672">.</span>sigmoid(fake_logits)))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> loss
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    loss, grads <span style="color:#f92672">=</span> value_and_grad(loss_fn)(gen_state<span style="color:#f92672">.</span>params)
+</span></span><span style="display:flex;"><span>    gen_state <span style="color:#f92672">=</span> gen_state<span style="color:#f92672">.</span>apply_gradients(grads<span style="color:#f92672">=</span>grads)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> gen_state, loss
+</span></span></code></pre></div><h2 id="conclusion">Conclusion</h2>
+<p>We saw how to implement a GAN in Flax, by first going into some theoretical review and then diving into some of the peculiarities of this framework.
+I hope you found this exploration useful and interesting as it was for me to write it. Your feedback, comments, and critiques are welcome. For those interested, the full code is available on <a href="https://github.com/domenicocinque/implementations/tree/main/gan">GitHub</a>.</p>
+<h2 id="references">References</h2>
+<ul>
+<li>Kevin P. Murphy (2023). <em>Probabilistic Machine Learning: Advanced Topics</em>. MIT Press.</li>
+</ul>
+
+</content>
+<p>
+  
+</p>
+
+  </main>
+  <footer>Made with <a href="https://github.com/janraasch/hugo-bearblog/">Hugo ʕ•ᴥ•ʔ Bear</a>
+</footer>
+
+    
+
+  
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],  
+      displayMath: [['$$', '$$'], ['\\[', '\\]']] 
+    },
+    svg: {
+      fontCache: 'global'
+    }
+  };
+</script>
+
+  
+</body>
+
+</html>

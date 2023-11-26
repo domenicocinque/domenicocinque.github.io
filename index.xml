@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Domenico Cinque</title>
+    <link>https://domenicocinque.github.io/</link>
+    <description>Recent content on Domenico Cinque</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-US</language>
+    <copyright>Copyright © 2023, Domenico Mattia Cinque.</copyright>
+    <lastBuildDate>Sun, 19 Nov 2023 16:33:14 +0100</lastBuildDate>
+    <atom:link href="https://domenicocinque.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Old Models, New Frameworks: Reviving GANs with Flax</title>
+      <link>https://domenicocinque.github.io/old-models-new-frameworks-reviving-gans-with-flax/</link>
+      <pubDate>Sun, 19 Nov 2023 16:33:14 +0100</pubDate>
+      <guid>https://domenicocinque.github.io/old-models-new-frameworks-reviving-gans-with-flax/</guid>
+      <description>The purpose of this blog post is to guide you through the implementation of a Generative Adversarial Network (GAN) with Flax.
+My journey into this topic began with JAX, a new framework by Google that combines a Numpy-like interface with advanced features like Autograd and XLA compilation for incredibly fast numerical computation. What&amp;rsquo;s more, it&amp;rsquo;s built on the principles of functional programming, meaning functions are purely dependent on input parameters, free from external state influences.</description>
+    </item>
+  </channel>
+</rss>
