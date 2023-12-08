@@ -16,8 +16,8 @@
 <meta property="og:description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://domenicocinque.github.io/old-models-new-frameworks-reviving-gans-with-flax/" /><meta property="og:image" content="https://domenicocinque.github.io/images/share.png"/><meta property="article:section" content="blog" />
-<meta property="article:published_time" content="2023-11-19T16:33:14+01:00" />
-<meta property="article:modified_time" content="2023-11-19T16:33:14+01:00" /><meta property="og:site_name" content="Hugo ʕ•ᴥ•ʔ Bear" />
+<meta property="article:published_time" content="2023-12-08T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-12-08T00:00:00+00:00" /><meta property="og:site_name" content="Hugo ʕ•ᴥ•ʔ Bear" />
 
 
 
@@ -31,9 +31,9 @@
 
 
 <meta itemprop="name" content="Old Models, New Frameworks: Reviving GANs with Flax">
-<meta itemprop="description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks."><meta itemprop="datePublished" content="2023-11-19T16:33:14+01:00" />
-<meta itemprop="dateModified" content="2023-11-19T16:33:14+01:00" />
-<meta itemprop="wordCount" content="1544"><meta itemprop="image" content="https://domenicocinque.github.io/images/share.png"/>
+<meta itemprop="description" content="Explore the world of Generative Adversarial Networks (GANs) in this guide to implementing GANs using the Flax framework. Dive deep into the theory and practical aspects of GANs, and learn how Flax&#39;s unique features make it an excellent choice for building complex neural networks."><meta itemprop="datePublished" content="2023-12-08T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2023-12-08T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1555"><meta itemprop="image" content="https://domenicocinque.github.io/images/share.png"/>
 <meta itemprop="keywords" content="" />
 <meta name="referrer" content="no-referrer-when-downgrade" />
 
@@ -229,8 +229,8 @@
 <h1>Old Models, New Frameworks: Reviving GANs with Flax</h1>
 <p>
   <i>
-    <time datetime='2023-11-19' pubdate>
-      19 Nov, 2023
+    <time datetime='2023-12-08' pubdate>
+      08 Dec, 2023
     </time>
   </i>
 </p>
@@ -268,7 +268,40 @@ However, when the generator performs poorly, hence $D_\phi(G_\theta(\mathbf z))\
 $$\min_\theta -\log[D_\phi(G_\theta(\mathbf z))]$$</li>
 </ol>
 <h2 id="implementation">Implementation</h2>
-<h3 id="generator-and-discriminator">Generator and Discriminator</h3>
+<h3 id="data-generation">Data Generation</h3>
+<p>In our example, we will consider a simple distribution as our dataset, where using GANs might seem like overkill but serves as a good example.</p>
+<p><img src="/images/circle_data.png" alt="dataset"></p>
+<p>In the following code, we can see data generation and dataloader. Notice that we need to handle the random number generation ourselves, as we did for the generator. More on this in the documentation <a href="https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#random-numbers">here</a>.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Tuple
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jax
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jax.numpy <span style="color:#66d9ef">as</span> jnp
+</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> jax <span style="color:#f92672">import</span> random
+</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_circle_data</span>(
+</span></span><span style="display:flex;"><span>    key: random<span style="color:#f92672">.</span>PRNGKey, n_samples: int, r: int <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, noise: float <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.05</span>
+</span></span><span style="display:flex;"><span>):
+</span></span><span style="display:flex;"><span>    subkey1, subkey2, subkey3 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>split(key, <span style="color:#ae81ff">3</span>)
+</span></span><span style="display:flex;"><span>    theta <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>uniform(
+</span></span><span style="display:flex;"><span>        key<span style="color:#f92672">=</span>subkey1, shape<span style="color:#f92672">=</span>(n_samples,), minval<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, maxval<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>pi
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>    x_noise <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(key<span style="color:#f92672">=</span>subkey2, shape<span style="color:#f92672">=</span>(n_samples,)) <span style="color:#f92672">*</span> noise
+</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> r <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>cos(theta) <span style="color:#f92672">+</span> x_noise
+</span></span><span style="display:flex;"><span>    y_noise <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(key<span style="color:#f92672">=</span>subkey3, shape<span style="color:#f92672">=</span>(n_samples,)) <span style="color:#f92672">*</span> noise
+</span></span><span style="display:flex;"><span>    y <span style="color:#f92672">=</span> r <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>sin(theta) <span style="color:#f92672">+</span> y_noise
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jnp<span style="color:#f92672">.</span>stack([x, y], axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_dataloader</span>(dataset: Tuple[np<span style="color:#f92672">.</span>ndarray, <span style="color:#f92672">...</span>], batch_size: int):
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (
+</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>Dataset<span style="color:#f92672">.</span>from_tensor_slices(dataset)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>shuffle(<span style="color:#ae81ff">2000</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>batch(batch_size, drop_remainder<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>as_numpy_iterator()
+</span></span><span style="display:flex;"><span>    )
+</span></span></code></pre></div><h3 id="generator-and-discriminator">Generator and Discriminator</h3>
 <p>We&rsquo;ll use Flax&rsquo;s <code>linen</code> module for defining our models. It offers a PyTorch-like class instantiation but the key difference is that we&rsquo;re defining a dataclass, which doesn&rsquo;t hold the network&rsquo;s parameters itself, but only serves as a &ldquo;storage&rdquo; of functions to apply.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">import</span> jax
 </span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> flax.linen <span style="color:#66d9ef">as</span> nn
@@ -308,39 +341,6 @@ $$\min_\theta -\log[D_\phi(G_\theta(\mathbf z))]$$</li>
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">discriminator_model</span>(hidden_channels):
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> Discriminator(hidden_channels<span style="color:#f92672">=</span>hidden_channels)
-</span></span></code></pre></div><h3 id="data-generation">Data Generation</h3>
-<p>In our example, we will consider a simple distribution as our dataset, where using GANs might seem like overkill but serves as a good example.</p>
-<p><img src="/images/circle_data.png" alt="dataset"></p>
-<p>In the following code, we can see data generation and dataloader. Notice that we need to handle the random number generation ourselves, as we did for the generator. More on this in the documentation <a href="https://jax.readthedocs.io/en/latest/notebooks/Common_Gotchas_in_JAX.html#random-numbers">here</a>.</p>
-<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#f92672">from</span> typing <span style="color:#f92672">import</span> Tuple
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> numpy <span style="color:#66d9ef">as</span> np
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jax
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> jax.numpy <span style="color:#66d9ef">as</span> jnp
-</span></span><span style="display:flex;"><span><span style="color:#f92672">from</span> jax <span style="color:#f92672">import</span> random
-</span></span><span style="display:flex;"><span><span style="color:#f92672">import</span> tensorflow <span style="color:#66d9ef">as</span> tf
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">generate_circle_data</span>(
-</span></span><span style="display:flex;"><span>    key: random<span style="color:#f92672">.</span>PRNGKey, n_samples: int, r: int <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>, noise: float <span style="color:#f92672">=</span> <span style="color:#ae81ff">0.05</span>
-</span></span><span style="display:flex;"><span>):
-</span></span><span style="display:flex;"><span>    subkey1, subkey2, subkey3 <span style="color:#f92672">=</span> random<span style="color:#f92672">.</span>split(key, <span style="color:#ae81ff">3</span>)
-</span></span><span style="display:flex;"><span>    theta <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>uniform(
-</span></span><span style="display:flex;"><span>        key<span style="color:#f92672">=</span>subkey1, shape<span style="color:#f92672">=</span>(n_samples,), minval<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>, maxval<span style="color:#f92672">=</span><span style="color:#ae81ff">2</span> <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>pi
-</span></span><span style="display:flex;"><span>    )
-</span></span><span style="display:flex;"><span>    x_noise <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(key<span style="color:#f92672">=</span>subkey2, shape<span style="color:#f92672">=</span>(n_samples,)) <span style="color:#f92672">*</span> noise
-</span></span><span style="display:flex;"><span>    x <span style="color:#f92672">=</span> r <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>cos(theta) <span style="color:#f92672">+</span> x_noise
-</span></span><span style="display:flex;"><span>    y_noise <span style="color:#f92672">=</span> jax<span style="color:#f92672">.</span>random<span style="color:#f92672">.</span>normal(key<span style="color:#f92672">=</span>subkey3, shape<span style="color:#f92672">=</span>(n_samples,)) <span style="color:#f92672">*</span> noise
-</span></span><span style="display:flex;"><span>    y <span style="color:#f92672">=</span> r <span style="color:#f92672">*</span> jnp<span style="color:#f92672">.</span>sin(theta) <span style="color:#f92672">+</span> y_noise
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> jnp<span style="color:#f92672">.</span>stack([x, y], axis<span style="color:#f92672">=</span><span style="color:#ae81ff">1</span>)
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">get_dataloader</span>(dataset: Tuple[np<span style="color:#f92672">.</span>ndarray, <span style="color:#f92672">...</span>], batch_size: int):
-</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> (
-</span></span><span style="display:flex;"><span>        tf<span style="color:#f92672">.</span>data<span style="color:#f92672">.</span>Dataset<span style="color:#f92672">.</span>from_tensor_slices(dataset)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>shuffle(<span style="color:#ae81ff">2000</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>batch(batch_size, drop_remainder<span style="color:#f92672">=</span><span style="color:#66d9ef">True</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#f92672">.</span>as_numpy_iterator()
-</span></span><span style="display:flex;"><span>    )
 </span></span></code></pre></div><h3 id="training-loop">Training Loop</h3>
 <p>The training loop consists of initializing the models and defining the training steps for both the generator and discriminator. First, we use <code>functools.partial</code> to derive functions with certain arguments pre-filled, then we need to initialize the parameters of the networks by using the <code>init</code> method of the <code>linen</code> module.</p>
 <div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#75715e"># We use partial to pass the hidden_channels and batch_size to the model</span>
@@ -428,7 +428,9 @@ $$\min_\theta -\log[D_\phi(G_\theta(\mathbf z))]$$</li>
 </span></span><span style="display:flex;"><span>    loss, grads <span style="color:#f92672">=</span> value_and_grad(loss_fn)(gen_state<span style="color:#f92672">.</span>params)
 </span></span><span style="display:flex;"><span>    gen_state <span style="color:#f92672">=</span> gen_state<span style="color:#f92672">.</span>apply_gradients(grads<span style="color:#f92672">=</span>grads)
 </span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> gen_state, loss
-</span></span></code></pre></div><p>These ingredients are enough to train our GAN. The full code is available on <a href="https://github.com/domenicocinque/implementations/tree/main/gan">GitHub</a>.
+</span></span></code></pre></div><p>These ingredients are enough to train our GAN. Below the final result at the end of the training process:</p>
+<p><img src="/images/final_predictions.png" alt="training"></p>
+<p>The full code is available on <a href="https://github.com/domenicocinque/implementations/tree/main/gan">GitHub</a>.
 At the end of the training process you should see a nice GIF that shows the evolution of the generator&rsquo;s output.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>We saw how to implement a GAN in Flax, by first going into some theoretical review and then diving into some of the peculiarities of this framework.
