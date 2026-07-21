@@ -16,6 +16,26 @@ body {
     gap: 2.5rem;
 }
 
+.embed-page {
+    max-width: 95%;
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.notebook-container {
+    width: 100%;
+}
+
+.notebook-embed {
+    display: block;
+    width: 100%;
+    height: calc(100vh - 10rem);
+    min-height: 700px;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    background: #fff;
+}
+
 .site-header {
     padding-bottom: 1.5rem;
     border-bottom: 1px solid #2d2d2d;
