@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Let agents implement specifications rather than infer them — Domenico Cinque</title>
+        <link rel="stylesheet" href="../../styles.css" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css"
+        />
+        <script
+            defer
+            src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"
+        ></script>
+        <script
+            defer
+            src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+        ></script>
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css"
+        />
+        <script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    </head>
+    <body>
+        <div class="wrap">
+            <header class="site-header">
+                <div class="site-header__inner">
+                    <a class="site-title" href="/index.html">Domenico Cinque</a>
+                    <nav class="site-nav">
+                        <a class="nav-link is-active" href="/index.html">Blog</a>
+                        <a class="nav-link" href="/about.html">About</a>
+                    </nav>
+                </div>
+            </header>
+
+            <article>
+                <h1>Let agents implement specifications rather than infer them</h1>
+                <div class="meta">Aug, 2026</div>
+<p>Since AI-assisted coding became mainstream, developers have debated how to work effectively with coding agents. One especially heated topic is how closely programmers should inspect AI-generated code. I believe part of the disagreement comes from a misunderstanding about what we are delegating to the agent.</p>
+<blockquote class="twitter-tweet" data-theme="dark">
+<p lang="en" dir="ltr">
+Control the ideas, not the code: blog post here <a href="https://t.co/RLjVUvGWVX">https://t.co/RLjVUvGWVX</a>
+</p>
+— antirez (<span class="citation" data-cites="antirez">@antirez</span>) <a href="https://x.com/antirez/status/2076634907049164891?ref_src=twsrc%5Etfw">July 13, 2026</a>
+</blockquote>
+<script async src="https://platform.x.com/widgets.js" charset="utf-8"></script>
+<p>These discussions often blur two different tasks:</p>
+<ul>
+<li>deciding what the software should do;</li>
+<li>implementing those decisions.</li>
+</ul>
+<p>I will refer to the first as <em>specification</em>, denoted by <span class="math inline">\(S\)</span>. It encompasses the collection of requirements, constraints, assumptions, and design decisions that determine what counts as an acceptable implementation. The second is the actual implementation, denoted by <span class="math inline">\(C\)</span>.</p>
+<p>A user’s prompt <span class="math inline">\(P\)</span> usually does not fully determine <span class="math inline">\(S\)</span>:</p>
+<ul>
+<li>some decisions may have been made but left unstated;</li>
+<li>some constraints may remain implicit;</li>
+<li>some decisions may not have been made at all.</li>
+</ul>
+<p>This distinction matters: in the first two cases, the agent is trying to recover the user’s intent. In the last, it is doing design work on the user’s behalf.</p>
+<p>We can therefore treat the specification <span class="math inline">\(S\)</span> as a latent (unobserved) variable. Given <span class="math inline">\(P\)</span>, many specifications may remain possible. We can represent this uncertainty as <span class="math inline">\(p(S\mid P)\)</span> and, as a conceptual decomposition, see the process as:</p>
+<p><span class="math display">\[
+P \rightarrow p(S\mid P) \rightarrow C
+\]</span></p>
+<h2 id="the-risks-of-a-vague-prompt">The risks of a vague prompt</h2>
+<p>With a vague prompt, <span class="math inline">\(p(S\mid P)\)</span> is broad, since the prompt is compatible with many specifications. A prompt like <code>Add caching to the user lookup endpoint</code> is compatible with a local or shared cache, different TTLs, different invalidation policies, and so on. However, generating an implementation forces the model to commit to specific choices. Those choices will often reflect common patterns from training or conventions in the surrounding code, whether or not they match what the user would have chosen. The result is a plausible interpretation of <span class="math inline">\(P\)</span> that encodes design decisions the user never explicitly made.</p>
+<p>The risk here is twofold:</p>
+<ul>
+<li>decisions may be suboptimal because the agent cannot account for task-specific knowledge. For example, the user may know that accounts whose usernames start with <code>temp_</code> are temporary and should never be cached;</li>
+<li>we may be unaware of what is happening under the hood.</li>
+</ul>
+<h2 id="the-benefits-of-a-clear-vision">The benefits of a clear vision</h2>
+<p>The situation changes when the user has a clear model of the system they want to build and communicates that model clearly to the agent. The prompt can then encode architectural choices, constraints, invariants, <strong>ideas</strong>, and other important design decisions. As a result, <span class="math inline">\(p(S\mid P)\)</span> becomes more concentrated, and the agent has less freedom to decide what the software should be. Ideally, whatever remains underspecified is also less important. I like thinking of this as gaining control of a powerful (stochastic) racehorse.</p>
+<p>This brings us to the infamous question: should we read AI-generated code? I believe it depends:</p>
+<ul>
+<li>When the prompt is vague, reading the generated code means discovering which design decisions the agent made on our behalf.</li>
+<li>When the human largely controls the specification, that function becomes less important because the code implements decisions already made elsewhere.</li>
+</ul>
+<p>This reduces the need to read code <em>in order to discover design decisions</em>. It does not eliminate the need for review, since security, maintainability, integration, observability, and performance may still require direct inspection.</p>
+<p>However, this line of thinking helps us distinguish two distinct failure modes:</p>
+<ul>
+<li>The agent infers the wrong specification.</li>
+<li>The agent implements the specification incorrectly.</li>
+</ul>
+<p>Controlling the specification reduces the first kind of failure but does not eliminate the second. Tests, invariants, type systems, static analysis, and other established software engineering practices help address implementation failures.</p>
+<p>From this perspective, Antirez’s “control the ideas, not the code” sounds much less radical. Given a limited attention budget, human effort often has greater leverage when spent making important decisions explicit, <strong>controlling <span class="math inline">\(S\)</span></strong> rather than <strong>reading <span class="math inline">\(C\)</span></strong>.</p>
+            </article>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                hljs.highlightAll();
+                renderMathInElement(document.body, {
+                    delimiters: [
+                        { left: "$$", right: "$$", display: true },
+                        { left: "\\[", right: "\\]", display: true },
+                        { left: "$", right: "$", display: false },
+                        { left: "\\(", right: "\\)", display: false },
+                    ],
+                });
+            });
+        </script>
+    </body>
+</html>
